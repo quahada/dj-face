@@ -518,7 +518,8 @@ bail:
 // turn on/off face detection
 - (IBAction)toggleFaceDetection:(id)sender
 {
-	detectFaces = [(UISwitch *)sender isOn];
+	//detectFaces = [(UISwitch *)sender isOn];
+  detectFaces = true;
 	[[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:detectFaces];
 	if (!detectFaces) {
 		dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -653,7 +654,7 @@ bail:
       //[faceCoordinates removeLastObject];
     }
     calculatedVariance = [self variance: faceCoordinates];
-    //NSLog(@"variance: %f",calculatedVariance);
+    NSLog(@"variance: %f",calculatedVariance);
     if (calculatedVariance < 10){
       numberOfBoringFrames++;
     }else{
@@ -836,7 +837,7 @@ bail:
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+  [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
   NSString *fullURL = @"http://www.google.com";
   NSURL *url = [NSURL URLWithString:fullURL];
@@ -852,8 +853,8 @@ bail:
   //faceCoordinates = [NSMutableArray arrayWithCapacity:60];
   faceCoordinates = [[NSMutableArray alloc] init];
 	[self setupAVCapture];
-  float oldYvalue = 0;
-  int numberOfBoringFrames = 0;
+  oldYvalue = 0;
+  numberOfBoringFrames = 0;
 	square = [[UIImage imageNamed:@"squarePNG"] retain];
 	NSDictionary *detectorOptions = [[NSDictionary alloc] initWithObjectsAndKeys:CIDetectorAccuracyLow, CIDetectorAccuracy, @(YES), CIDetectorTracking, nil];
 	faceDetector = [[CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions] retain];
