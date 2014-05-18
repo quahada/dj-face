@@ -56,6 +56,11 @@
 	AVCaptureVideoPreviewLayer *previewLayer;
 	AVCaptureVideoDataOutput *videoDataOutput;
 	BOOL detectFaces;
+  NSMutableArray *faceCoordinates;
+  NSNumber *num;
+  float oldYvalue;
+  NSMutableArray *itemArray;
+  //NSMutableArray *anItem;
 	dispatch_queue_t videoDataOutputQueue;
 	AVCaptureStillImageOutput *stillImageOutput;
 	UIView *flashView;

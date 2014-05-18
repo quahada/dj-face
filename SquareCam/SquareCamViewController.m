@@ -179,6 +179,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 - (void)setupAVCapture;
 - (void)teardownAVCapture;
 - (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation;
+- (float)variance:(NSMutableArray *) countArray;
 @end
 
 @implementation SquareCamViewController
@@ -570,6 +571,18 @@ bail:
 	return videoBox;
 }
 
+- (float)variance:(NSMutableArray *) countArray
+{
+  //NSLog(@"avg = %@", [countArray valueForKeyPath:@"@avg.floatValue"]);
+  float average = [[countArray valueForKeyPath:@"@avg.floatValue"] floatValue];
+  float varianceCounter = 0;
+  for (int i = 0; i < [countArray count]; i++){
+    varianceCounter += ([countArray[i] floatValue] - average) * ([countArray[i] floatValue] - average);
+  }
+  varianceCounter = varianceCounter/[countArray count];
+  return varianceCounter;
+}
+
 // called asynchronously as the capture output is capturing sample buffers, this method asks the face detector (if on)
 // to detect features and for each draw the red square in a layer and set appropriate orientation
 - (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation
@@ -595,6 +608,7 @@ bail:
 	CGSize parentFrameSize = [previewView frame].size;
 	NSString *gravity = [previewLayer videoGravity];
 	BOOL isMirrored = [previewLayer isMirrored];
+  //BOOL isMirrored = false;
 	CGRect previewBox = [SquareCamViewController videoPreviewBoxForGravity:gravity 
 															   frameSize:parentFrameSize 
 															apertureSize:clap.size];
@@ -611,6 +625,37 @@ bail:
 		faceRect.size.height = temp;
 		temp = faceRect.origin.x;
 		faceRect.origin.x = faceRect.origin.y;
+    NSLog(@"Face coord: %f", faceRect.origin.y);
+    //if (ff.hasTrackingID){
+      //NSLog(@"Face %d coord: %f", ff.trackingID, faceRect.origin.y);
+      //NSLog(@"Face %d", ff.trackingID);
+      //if (faceCoordinates[ff.trackingID]== Nil){
+        //int numToAdd = ff.trackingID - [faceCoordinates count];
+        //for (int i=0; i<numToAdd; i++){
+        //  itemArray = [NSMutableArray arrayWithCapacity:60];
+        //  [faceCoordinates addObject:itemArray];
+        //}
+      //}
+      //[faceCoordinates[ff.trackingID] addObject:[NSNumber numberWithFloat:faceRect.origin.y] ];
+      //NSLog(@"[faceCoordinates[ff.trackingID] count]: %d",[faceCoordinates[ff.trackingID] count]);
+      //if ([faceCoordinates[ff.trackingID] count] > 60){
+        //[faceCoordinates[ff.trackingID] removeObjectAtIndex:0];
+      //}
+      
+    //}
+    //[faceCoordinates insertObject:[NSNumber numberWithFloat:faceRect.origin.y] atIndex:0];
+    num = [NSNumber numberWithFloat:faceRect.origin.y-oldYvalue];
+    oldYvalue = faceRect.origin.y;
+    [faceCoordinates addObject:num];
+    NSLog(@"[faceCoordinates[ff.trackingID] count]: %d",[faceCoordinates count]);
+    if ([faceCoordinates count] > 10){
+      [faceCoordinates removeObjectAtIndex:0];
+      //[faceCoordinates removeLastObject];
+    }
+    NSLog(@"variance: %f",[self variance: faceCoordinates]);
+    
+    
+    
 		faceRect.origin.y = temp;
 		// scale coordinates so they fit in the preview box, which may be scaled
 		CGFloat widthScaleBy = previewBox.size.width / clap.size.height;
@@ -782,9 +827,16 @@ bail:
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+  //[fac setOn:YES];
+  //[(UISwitch *)ui setOn:YES];
+  detectFaces = true;
+  //faceCoordinates = [NSMutableArray arrayWithObjects:[], [], [], [], nil];
+  //faceCoordinates = [NSMutableArray arrayWithCapacity:60];
+  faceCoordinates = [[NSMutableArray alloc] init];
 	[self setupAVCapture];
+  float oldYvalue = 0;
 	square = [[UIImage imageNamed:@"squarePNG"] retain];
-	NSDictionary *detectorOptions = [[NSDictionary alloc] initWithObjectsAndKeys:CIDetectorAccuracyLow, CIDetectorAccuracy, nil];
+	NSDictionary *detectorOptions = [[NSDictionary alloc] initWithObjectsAndKeys:CIDetectorAccuracyLow, CIDetectorAccuracy, @(YES), CIDetectorTracking, nil];
 	faceDetector = [[CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions] retain];
 	[detectorOptions release];
 }
