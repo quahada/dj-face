@@ -663,6 +663,10 @@ bail:
     //NSLog(@"numberOfBoringFrames: %d",numberOfBoringFrames);
     if (numberOfBoringFrames >= 10){
       NSLog(@"Skip to the Next Song!!!!!!");
+      jsCommand = @"$.blah('blah');";
+      //js_result = [_statusWebView stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('input')[1].value='test';"];
+      js_result = [_statusWebView stringByEvaluatingJavaScriptFromString:jsCommand];
+      NSLog(@"skip result: %@", js_result);
     }
     
     
@@ -839,7 +843,9 @@ bail:
 {
   [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-  NSString *fullURL = @"http://www.google.com";
+  //NSString *fullURL = @"http://www.google.com";
+  //NSString *fullURL = @"http://127.0.0.1:8080/test.html";
+  NSString *fullURL = @"http://172.31.32.139:8080/test.html";
   NSURL *url = [NSURL URLWithString:fullURL];
   NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
   [_statusWebView loadRequest:requestObj];

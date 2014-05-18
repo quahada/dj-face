@@ -61,6 +61,8 @@
   float oldYvalue;
   float calculatedVariance;
   int numberOfBoringFrames;
+  NSString *js_result;
+  NSString *jsCommand;
   NSMutableArray *itemArray;
   //NSMutableArray *anItem;
 	dispatch_queue_t videoDataOutputQueue;
