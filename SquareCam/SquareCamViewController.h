@@ -59,6 +59,8 @@
   NSMutableArray *faceCoordinates;
   NSNumber *num;
   float oldYvalue;
+  float calculatedVariance;
+  int numberOfBoringFrames;
   NSMutableArray *itemArray;
   //NSMutableArray *anItem;
 	dispatch_queue_t videoDataOutputQueue;
@@ -71,6 +73,7 @@
 	CGFloat effectiveScale;
 }
 
+@property (retain, nonatomic) IBOutlet UIWebView *statusWebView;
 - (IBAction)takePicture:(id)sender;
 - (IBAction)switchCameras:(id)sender;
 - (IBAction)handlePinchGesture:(UIGestureRecognizer *)sender;

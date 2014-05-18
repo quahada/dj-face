@@ -625,7 +625,7 @@ bail:
 		faceRect.size.height = temp;
 		temp = faceRect.origin.x;
 		faceRect.origin.x = faceRect.origin.y;
-    NSLog(@"Face coord: %f", faceRect.origin.y);
+    //NSLog(@"Face coord: %f", faceRect.origin.y);
     //if (ff.hasTrackingID){
       //NSLog(@"Face %d coord: %f", ff.trackingID, faceRect.origin.y);
       //NSLog(@"Face %d", ff.trackingID);
@@ -647,12 +647,22 @@ bail:
     num = [NSNumber numberWithFloat:faceRect.origin.y-oldYvalue];
     oldYvalue = faceRect.origin.y;
     [faceCoordinates addObject:num];
-    NSLog(@"[faceCoordinates[ff.trackingID] count]: %d",[faceCoordinates count]);
+    //NSLog(@"[faceCoordinates[ff.trackingID] count]: %d",[faceCoordinates count]);
     if ([faceCoordinates count] > 10){
       [faceCoordinates removeObjectAtIndex:0];
       //[faceCoordinates removeLastObject];
     }
-    NSLog(@"variance: %f",[self variance: faceCoordinates]);
+    calculatedVariance = [self variance: faceCoordinates];
+    //NSLog(@"variance: %f",calculatedVariance);
+    if (calculatedVariance < 10){
+      numberOfBoringFrames++;
+    }else{
+      numberOfBoringFrames = 0;
+    }
+    //NSLog(@"numberOfBoringFrames: %d",numberOfBoringFrames);
+    if (numberOfBoringFrames >= 10){
+      NSLog(@"Skip to the Next Song!!!!!!");
+    }
     
     
     
@@ -788,6 +798,7 @@ bail:
 	[self teardownAVCapture];
 	[faceDetector release];
 	[square release];
+  [_statusWebView release];
 	[super dealloc];
 }
 
@@ -827,6 +838,13 @@ bail:
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+  NSString *fullURL = @"http://www.google.com";
+  NSURL *url = [NSURL URLWithString:fullURL];
+  NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+  [_statusWebView loadRequest:requestObj];
+  [UIToolbar removeFromSuperview];
+  
+  
   //[fac setOn:YES];
   //[(UISwitch *)ui setOn:YES];
   detectFaces = true;
@@ -835,6 +853,7 @@ bail:
   faceCoordinates = [[NSMutableArray alloc] init];
 	[self setupAVCapture];
   float oldYvalue = 0;
+  int numberOfBoringFrames = 0;
 	square = [[UIImage imageNamed:@"squarePNG"] retain];
 	NSDictionary *detectorOptions = [[NSDictionary alloc] initWithObjectsAndKeys:CIDetectorAccuracyLow, CIDetectorAccuracy, @(YES), CIDetectorTracking, nil];
 	faceDetector = [[CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions] retain];
@@ -843,6 +862,7 @@ bail:
 
 - (void)viewDidUnload
 {
+  [self setStatusWebView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
