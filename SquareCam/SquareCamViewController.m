@@ -180,6 +180,7 @@ static CGContextRef CreateCGBitmapContextForSize(CGSize size)
 - (void)teardownAVCapture;
 - (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation;
 - (float)variance:(NSMutableArray *) countArray;
+- (void)sendRequest;
 @end
 
 @implementation SquareCamViewController
@@ -572,6 +573,20 @@ bail:
 	return videoBox;
 }
 
+- (void)sendRequest
+{
+  NSURLRequest *theRequest=[NSURLRequest requestWithURL:[NSURL URLWithString:fullURL]
+                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                          timeoutInterval:10.0];
+  //NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+  //response = nil;
+  //res_data = [NSURLConnection sendSynchronousRequest:theRequest returningResponse:&response error:nil];
+  [NSURLConnection sendAsynchronousRequest:theRequest queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+    //[queue release];
+    [theRequest release];
+  }];
+}
+
 - (float)variance:(NSMutableArray *) countArray
 {
   //NSLog(@"avg = %@", [countArray valueForKeyPath:@"@avg.floatValue"]);
@@ -663,10 +678,23 @@ bail:
     //NSLog(@"numberOfBoringFrames: %d",numberOfBoringFrames);
     if (numberOfBoringFrames >= 10){
       NSLog(@"Skip to the Next Song!!!!!!");
-      jsCommand = @"$.blah('blah');";
+      //jsCommand = @"$.blah('blah');";
       //js_result = [_statusWebView stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('input')[1].value='test';"];
-      js_result = [_statusWebView stringByEvaluatingJavaScriptFromString:jsCommand];
-      NSLog(@"skip result: %@", js_result);
+      //js_result = [_statusWebView stringByEvaluatingJavaScriptFromString:jsCommand];
+      //NSLog(@"skip result: %@", js_result);
+      
+      /*
+       theRequest=[NSURLRequest requestWithURL:[NSURL URLWithString:fullURL]
+                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
+                              timeoutInterval:60.0];
+      queue = [[NSOperationQueue alloc] init];
+      //response = nil;
+      //res_data = [NSURLConnection sendSynchronousRequest:theRequest returningResponse:&response error:nil];
+      [NSURLConnection sendAsynchronousRequest:theRequest queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
+        [queue release];
+      }];
+      */
+      [self sendRequest];
     }
     
     
@@ -843,12 +871,24 @@ bail:
 {
   [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-  //NSString *fullURL = @"http://www.google.com";
-  //NSString *fullURL = @"http://127.0.0.1:8080/test.html";
-  NSString *fullURL = @"http://172.31.32.139:8080/test.html";
-  NSURL *url = [NSURL URLWithString:fullURL];
-  NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-  [_statusWebView loadRequest:requestObj];
+  //fullURL = @"http://www.google.com";
+  //fullURL = @"http://127.0.0.1:8080/test.html";
+  fullURL = @"http://172.31.32.139:8080/test.html";
+  //fullURL = @"http://172.31.32.139:8080/soundcloud.html";
+  //fullURL = @"http://api.soundcloud.com/tracks/33427584";
+  url = [NSURL URLWithString:fullURL];
+  requestObj = [NSURLRequest requestWithURL:url];
+  //[_statusWebView loadRequest:requestObj];
+  
+  //theRequest=[NSURLRequest requestWithURL:[NSURL URLWithString:fullURL]
+  //                                          cachePolicy:NSURLRequestUseProtocolCachePolicy
+  //                                      timeoutInterval:60.0];
+  //response = nil;
+  //res_data = [NSURLConnection sendSynchronousRequest:theRequest returningResponse:&response error:nil];
+  //queue = [[NSOperationQueue alloc] init];
+  queue = [[NSOperationQueue alloc] init];
+  
+  
   //[UIToolbar removeFromSuperview];
   
   
@@ -865,6 +905,7 @@ bail:
 	NSDictionary *detectorOptions = [[NSDictionary alloc] initWithObjectsAndKeys:CIDetectorAccuracyLow, CIDetectorAccuracy, @(YES), CIDetectorTracking, nil];
 	faceDetector = [[CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions] retain];
 	[detectorOptions release];
+  
 }
 
 - (void)viewDidUnload

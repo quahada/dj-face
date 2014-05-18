@@ -65,6 +65,14 @@
   NSString *jsCommand;
   NSMutableArray *itemArray;
   //NSMutableArray *anItem;
+  NSString *fullURL;
+  NSURL *url;
+  NSOperationQueue *queue;
+  //NSURLRequest *theRequest;
+  NSURLRequest *requestObj;
+  NSURLResponse* response;
+  NSData* res_data;
+  
 	dispatch_queue_t videoDataOutputQueue;
 	AVCaptureStillImageOutput *stillImageOutput;
 	UIView *flashView;
