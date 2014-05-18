@@ -842,7 +842,7 @@ bail:
   NSURL *url = [NSURL URLWithString:fullURL];
   NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
   [_statusWebView loadRequest:requestObj];
-  [UIToolbar removeFromSuperview];
+  //[UIToolbar removeFromSuperview];
   
   
   //[fac setOn:YES];
